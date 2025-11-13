@@ -1,53 +1,102 @@
 <app-modal [isOpen]="isOpen" [title]="product?.id ? 'Editar Producto' : 'Nuevo Producto'" (closed)="onClose()">
 
+    <!-- Input oculto para capturar el código de barras -->
+    <input type="text" #barcodeInput class="barcode-input-hidden" autocomplete="off">
+
     <form #productForm="ngForm" (ngSubmit)="onSubmit()" class="product-form">
-        <div class="form-group">
-            <label for="name">Nombre *</label>
-            <input type="text" id="name" name="name" [(ngModel)]="formData.name" required class="form-control">
+
+        <!-- Sección de código de barras (siempre habilitada) -->
+        <div class="form-section scan-section" [class.scan-completed]="barcodeScanned || isEditMode">
+            <h3 class="section-title">
+                <span class="section-icon">📦</span>
+                Configuración de Código de Barras
+            </h3>
+            
+            <div class="form-group barcode-group">
+                <label for="barraCode" class="required">Código de Barras *</label>
+                <div class="barcode-input-container">
+                    <input type="text" id="barraCode" name="barraCode" [(ngModel)]="formData.barraCode" 
+                        class="form-control" [class.scan-success]="barcodeScanned || isEditMode" readonly>
+                    <div class="barcode-actions">
+                        <button type="button" class="btn-generate-barcode" 
+                                (click)="generateRandomBarcode()"
+                                title="Generar código aleatorio">
+                            <span class="btn-icon">🎲</span>
+                        </button>
+                    </div>
+                </div>
+                <small class="field-hint" [class.scan-success]="barcodeScanned || isEditMode"
+                    [class.scan-ready]="!(barcodeScanned || isEditMode)">
+                    {{ !(barcodeScanned || isEditMode) ? 'Escanee un código o genere uno automáticamente' : '✓ Código configurado correctamente' }}
+                </small>
+                <div class="barcode-status" [class.scan-completed]="barcodeScanned || isEditMode"
+                    [class.scan-pending]="!(barcodeScanned || isEditMode)">
+                    {{ (barcodeScanned || isEditMode) ? '✓' : '⏳' }}
+                </div>
+            </div>
+            
+            <!-- Solo mostrar re-escanear si ya hay un código -->
+            <div class="rescan-action" *ngIf="barcodeScanned && !isEditMode">
+                <button type="button" class="btn-rescan" (click)="rescanBarcode()" title="Re-escanear código">
+                    <span class="btn-icon">🔄</span>
+                    Re-escanear Código
+                </button>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="description">Descripción</label>
-            <textarea id="description" name="description" [(ngModel)]="formData.description" rows="3"
-                class="form-control"></textarea>
-        </div>
+        <!-- Sección de información del producto (se habilita después del escaneo) -->
+        <div class="form-section" [class.disabled-section]="!(barcodeScanned || isEditMode)">
+            <h3 class="section-title">
+                <span class="section-icon">📝</span>
+                Información del Producto
+            </h3>
 
-        <div class="form-row">
             <div class="form-group">
-                <label for="price">Precio *</label>
-                <input type="number" id="price" name="price" [(ngModel)]="formData.price" required min="0" step="0.01"
-                    class="form-control">
+                <label for="name" class="required">Nombre *</label>
+                <input type="text" id="name" name="name" [(ngModel)]="formData.name" required class="form-control"
+                    [disabled]="!(barcodeScanned || isEditMode)">
             </div>
 
             <div class="form-group">
-                <label for="stock">Stock *</label>
-                <input type="number" id="stock" name="stock" [(ngModel)]="formData.stock" required min="0"
-                    class="form-control">
+                <label for="description">Descripción</label>
+                <textarea id="description" name="description" [(ngModel)]="formData.description" rows="3"
+                    class="form-control" [disabled]="!(barcodeScanned || isEditMode)"></textarea>
             </div>
-        </div>
 
-        <div class="form-group">
-            <label for="barraCode">Código de Barras</label>
-            <input type="text" id="barraCode" name="barraCode" disabled="true" [(ngModel)]="formData.barraCode"
-                class="form-control">
-        </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="price" class="required">Precio *</label>
+                    <input type="number" id="price" name="price" [(ngModel)]="formData.price" required min="0"
+                        step="0.01" class="form-control" [disabled]="!(barcodeScanned || isEditMode)">
+                </div>
 
-        <div class="form-group">
-            <label for="category">Categoría</label>
-            <input type="text" id="category" name="category" [(ngModel)]="formData.category" class="form-control">
-        </div>
+                <div class="form-group">
+                    <label for="stock" class="required">Stock *</label>
+                    <input type="number" id="stock" name="stock" [(ngModel)]="formData.stock" required min="0"
+                        class="form-control" [disabled]="!(barcodeScanned || isEditMode)">
+                </div>
+            </div>
 
-        <div class="form-group">
-            <label class="checkbox-label">
-                <input type="checkbox" name="status" [(ngModel)]="formData.status">
-                Producto activo
-            </label>
+            <div class="form-group">
+                <label for="category">Categoría</label>
+                <input type="text" id="category" name="category" [(ngModel)]="formData.category" class="form-control"
+                    [disabled]="!(barcodeScanned || isEditMode)">
+            </div>
+
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="status" [(ngModel)]="formData.status"
+                        [disabled]="!(barcodeScanned || isEditMode)">
+                    <span class="checkbox-text">Producto activo</span>
+                </label>
+            </div>
         </div>
     </form>
 
     <div class="modal-actions">
         <button type="button" class="btn-submit" (click)="onSubmit()"
-            [disabled]="!formData.name || !formData.price || formData.stock === undefined">
+            [disabled]="!formData.barraCode || !formData.name || !formData.price || formData.stock === undefined">
+            <span class="btn-icon">{{ product?.id ? '✏️' : '➕' }}</span>
             {{ product?.id ? 'Actualizar' : 'Crear' }} Producto
         </button>
     </div>

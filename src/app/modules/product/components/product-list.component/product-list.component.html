@@ -9,23 +9,18 @@
   <!-- BUSCADOR Y FILTROS -->
   <div class="search-filters-section">
     <div class="search-container">
-      <input 
-        type="text" 
-        class="search-input" 
-        placeholder="Buscar productos por nombre, código o descripción..."
-        [(ngModel)]="searchTerm"
-        (input)="applyFilter()"
-      >
+      <input type="text" class="search-input" placeholder="Buscar productos por nombre, código o descripción..."
+        [(ngModel)]="searchTerm" (input)="applyFilter()">
       <span class="search-icon">🔍</span>
     </div>
-    
+
     <div class="filters-container">
       <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
         <option value="">Todos los estados</option>
         <option value="active">Activos</option>
         <option value="inactive">Inactivos</option>
       </select>
-      
+
       <select class="filter-select" [(ngModel)]="stockFilter" (change)="applyFilter()">
         <option value="">Todo el stock</option>
         <option value="low">Stock bajo (≤ 5)</option>
@@ -61,7 +56,15 @@
             </span>
           </td>
           <td>{{ product.status ? 'Activo' : 'Inactivo' }}</td>
-          <td class="barcode"><div [appBarcode]="product.barraCode || '' "></div></td>
+          <td class="barcode">
+            <div class="barcode-container">
+              <div [appBarcode]="product.barraCode || ''"></div>
+              <button (click)="downloadBarcode(product.barraCode || '')" class="btn-download-barcode"
+                title="Descargar código de barras" *ngIf="product.barraCode">
+                📥
+              </button>
+            </div>
+          </td>
           <td class="actions">
             <button (click)="editarProducto(product)" class="btn btn-edit">
               ✏️ Editar

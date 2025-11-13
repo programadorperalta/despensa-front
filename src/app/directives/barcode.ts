@@ -34,12 +34,18 @@ export class BarcodeDirective implements OnChanges {
           displayValue: this.displayValue,
           margin: 0
         });
+
+        // ✅ AGREGAR ESTA LÍNEA: Poner el atributo data-barcode en el contenedor
+        this.el.nativeElement.setAttribute('data-barcode', this.appBarcode);
+        
       } catch (error) {
         console.error('Error generating barcode:', error);
         this.el.nativeElement.innerHTML = this.appBarcode;
+        this.el.nativeElement.setAttribute('data-barcode', this.appBarcode);
       }
     } else {
       this.el.nativeElement.innerHTML = 'N/A';
+      this.el.nativeElement.removeAttribute('data-barcode');
     }
   }
 }
