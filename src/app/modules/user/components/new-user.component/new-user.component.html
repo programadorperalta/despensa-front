@@ -1,0 +1,88 @@
+<div class="new-user-container" *ngIf="isVisible">
+  <div class="header-section">
+    <h2>{{ username ? 'Completar Registro' : 'Crear Nueva Contraseña' }}</h2>
+    <p class="subtitle">
+      {{ username ?
+      'Complete su registro estableciendo una contraseña segura' :
+      'Establezca una nueva contraseña para su cuenta'
+      }}
+    </p>
+  </div>
+
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+    <!-- Información del usuario (solo lectura) -->
+    <div class="user-info" *ngIf="username">
+      <div class="info-item">
+        <span class="label">Usuario:</span>
+        <span class="value">{{ username || username }}</span>
+      </div>
+    </div>
+
+    <!-- Campo de nueva contraseña -->
+    <div class="form-group">
+      <label for="newPassword">Nueva contraseña *</label>
+      <input [type]="showPassword ? 'text' : 'password'" id="newPassword" formControlName="newPassword"
+        placeholder="Ingrese su nueva contraseña" [class.error]="isFieldInvalid('newPassword')">
+      <button type="button" class="toggle-password" (click)="togglePasswordVisibility()">
+        {{ showPassword ? '👁️‍🗨️' : '👁️' }}
+      </button>
+      <div class="error-message" *ngIf="isFieldInvalid('newPassword')">
+        <span *ngIf="userForm.get('newPassword')?.errors?.['required']">
+          La contraseña es requerida
+        </span>
+        <span *ngIf="userForm.get('newPassword')?.errors?.['minlength']">
+          Mínimo 6 caracteres
+        </span>
+      </div>
+    </div>
+
+    <!-- Confirmar contraseña -->
+    <div class="form-group">
+      <label for="confirmPassword">Confirmar contraseña *</label>
+      <input [type]="showConfirmPassword ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword"
+        placeholder="Confirme su contraseña"
+        [class.error]="isFieldInvalid('confirmPassword') || userForm.hasError('passwordsMismatch')">
+      <button type="button" class="toggle-password" (click)="toggleConfirmPasswordVisibility()">
+        {{ showConfirmPassword ? '👁️‍🗨️' : '👁️' }}
+      </button>
+      <div class="error-message" *ngIf="isFieldInvalid('confirmPassword')">
+        <span *ngIf="userForm.get('confirmPassword')?.errors?.['required']">
+          Debe confirmar la contraseña
+        </span>
+      </div>
+      <div class="error-message"
+        *ngIf="userForm.hasError('passwordsMismatch') && userForm.get('confirmPassword')?.touched">
+        Las contraseñas no coinciden
+      </div>
+    </div>
+
+    <!-- Requisitos de contraseña -->
+    <div class="password-requirements">
+      <h4>La contraseña debe contener:</h4>
+      <ul>
+        <li [class.valid]="hasMinLength">• Mínimo 6 caracteres</li>
+        <li [class.valid]="hasUpperCase">• Al menos una mayúscula</li>
+        <li [class.valid]="hasLowerCase">• Al menos una minúscula</li>
+        <li [class.valid]="hasNumber">• Al menos un número</li>
+      </ul>
+    </div>
+
+    <!-- Mensajes de error general -->
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <!-- Botón de envío -->
+    <button type="submit" class="submit-btn" [disabled]="userForm.invalid || isLoading">
+      <span class="loading-spinner" *ngIf="isLoading"></span>
+      {{ isLoading ? 'Procesando...' : (username ? 'Completar Registro' : 'Crear Contraseña') }}
+    </button>
+
+    <!-- Enlace para cancelar -->
+    <div class="cancel-section">
+      <button type="button" class="cancel-btn" (click)="onCancel()">
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

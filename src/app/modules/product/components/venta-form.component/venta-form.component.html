@@ -1,0 +1,61 @@
+<div class="sale-modal-overlay" (click)="cerrarModal()">
+  <div class="sale-modal" (click)="$event.stopPropagation()">
+    <!-- Header del Modal -->
+    <div class="modal-header">
+      <h2 class="modal-title">💳 Confirmar Venta</h2>
+      <button class="btn-close" (click)="cerrarModal()">×</button>
+    </div>
+
+    <!-- Resumen de Productos -->
+    <div class="products-summary">
+      <h3 class="summary-title">Resumen de Productos</h3>
+      <div class="products-list">
+        <div *ngFor="let item of carritoParaVenta?.items" class="product-item">
+          <div class="product-info">
+            <span class="product-name">{{ item.name }}</span>
+            <span class="product-details">{{ item.cantidad }} x ${{ item.price | number:'1.2-2' }}</span>
+          </div>
+          <span class="product-subtotal">${{ item.subtotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Método de Pago -->
+    <div class="payment-method">
+      <h3 class="payment-title">Método de Pago</h3>
+      <div class="payment-options">
+        <label class="payment-option" *ngFor="let metodo of metodosPago">
+          <input 
+            type="radio" 
+            name="paymentMethod" 
+            [value]="metodo.value" 
+            [(ngModel)]="metodoSeleccionado"
+            [checked]="metodoSeleccionado === metodo.value">
+          <span class="checkmark"></span>
+          <span class="payment-icon">{{ metodo.icono }}</span>
+          <span class="payment-label">{{ metodo.nombre }}</span>
+        </label>
+      </div>
+    </div>
+
+    <!-- Total y Acciones -->
+    <div class="sale-total-section">
+      <div class="total-line">
+        <span class="total-label">Subtotal:</span>
+        <span class="total-amount">${{ calcularSubtotal() | number:'1.2-2' }}</span>
+      </div>
+      <div class="total-line">
+        <span class="total-label">Total:</span>
+        <span class="total-amount final">${{ calcularTotal() | number:'1.2-2' }}</span>
+      </div>
+    </div>
+
+    <!-- Acciones -->
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="cerrarModal()">Cancelar</button>
+      <button class="btn-confirm" (click)="confirmarVenta()" [disabled]="!metodoSeleccionado">
+        ✅ Confirmar Venta
+      </button>
+    </div>
+  </div>
+</div>

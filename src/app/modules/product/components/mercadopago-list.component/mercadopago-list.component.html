@@ -1,0 +1,161 @@
+<div class="product-list-container">
+  <div class="header">
+    <h2>💳 Pagos de MercadoPago</h2>
+    <button class="btn-primary" (click)="reloadPayments()">
+      🔄 Actualizar Pagos
+    </button>
+  </div>
+
+  <!-- Filtros y búsqueda -->
+  <div class="filters-section">
+    <div class="search-filter">
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Buscar por descripción, ID o referencia..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      >
+      <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
+        <option value="">Todos los estados</option>
+        <option value="approved">Aprobados</option>
+        <option value="pending">Pendientes</option>
+        <option value="rejected">Rechazados</option>
+      </select>
+      <select class="filter-select" [(ngModel)]="paymentMethodFilter" (change)="applyFilter()">
+        <option value="">Todos los métodos</option>
+        <option value="account_money">Saldo MercadoPago</option>
+        <option value="cvu">Transferencia</option>
+        <option value="interop_transfer">QR</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Estado de carga -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner"></div>
+    <span>Cargando pagos...</span>
+  </div>
+
+  <!-- Tabla de pagos -->
+  <div *ngIf="!loading" class="table-container">
+    <table class="products-table" *ngIf="filteredPayments.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Monto</th>
+          <th>Estado</th>
+          <th>Método</th>
+          <th>Pagador</th>
+          <th>Referencia</th>
+          <!-- <th>Acciones</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let payment of filteredPayments" class="product-row">
+          <td>
+            <span class="barcode">{{ payment.id }}</span>
+          </td>
+          <td>
+            <div class="date-info">
+              <div><strong>{{ formatDate(payment.date_approved) }}</strong></div>
+              <small class="text-muted">{{ formatTime(payment.date_approved) }}</small>
+            </div>
+          </td>
+          <td>
+            <div class="description">
+              <strong>{{ payment.description || 'Sin descripción' }}</strong>
+              <div *ngIf="payment.external_reference" class="external-ref">
+                <small>Ref: {{ payment.external_reference }}</small>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div class="price">${{ payment.transaction_amount }}</div>
+            <div *ngIf="payment.transaction_details?.net_received_amount !== payment.transaction_amount" 
+                 class="net-amount">
+              <small>Neto: ${{ payment.transaction_details?.net_received_amount }}</small>
+            </div>
+          </td>
+          <td>
+            <span [class]="getStatusClass(payment.status)" class="stock-status">
+              {{ getStatusText(payment.status) }}
+            </span>
+          </td>
+          <td>
+            <span class="payment-method">
+              {{ getPaymentMethodText(payment.payment_method_id) }}
+            </span>
+          </td>
+          <td>
+            <div *ngIf="payment.payer" class="payer-info">
+              <div><strong>{{ payment.payer.email }}</strong></div>
+              <div *ngIf="payment.payer.identification" class="identification">
+                <small>{{ payment.payer.identification.type }}: {{ payment.payer.identification.number }}</small>
+              </div>
+            </div>
+            <div *ngIf="!payment.payer" class="no-payer">
+              <small>Sin información</small>
+            </div>
+          </td>
+          <td>
+            <span class="barcode" *ngIf="payment.external_reference">
+              {{ payment.external_reference }}
+            </span>
+            <span *ngIf="!payment.external_reference" class="text-muted">-</span>
+          </td>
+          <!-- <td>
+            <div class="actions">
+               <button class="btn btn-edit" (click)="viewPaymentDetails(payment)" title="Ver detalles">
+                👁️ Ver
+              </button>
+              <button class="btn btn-delete" (click)="refundPayment(payment)" 
+                      [disabled]="payment.status !== 'approved'" title="Reembolsar">
+                💰 Reembolsar
+              </button>
+            </div>
+          </td> -->
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Estado vacío. En caso de que no se obtengan las credenciales de mercado pago se debe mostrar un mensaje con un boton para volver a intentar autenticarse.-->
+    <div *ngIf="filteredPayments.length === 0 && !loading && existsToken" class="no-products">
+      <div class="no-products-icon">💳</div>
+      <h3>No se encontraron pagos</h3>
+      <p *ngIf="payments.length === 0">No hay pagos disponibles o no se han configurado las credenciales.</p>
+      <p *ngIf="payments.length > 0">No hay pagos que coincidan con los filtros aplicados.</p>
+      <button class="btn-primary" (click)="reloadPayments()" style="margin-top: 1rem;">
+        🔄 Intentar de nuevo
+      </button>
+    </div>
+
+    <div class="no-products" *ngIf="!existsToken">
+      <div class="no-products-icon">✖️</div>
+      <h3>Por favor ingrese las credenciales de mercado pago para continuar</h3>
+      <button class="btn-primary" style="margin-top: 2rem;" (click)="openModalInCaseNotExists()">Ingresar credenciales</button>
+    </div>
+
+
+  </div>
+
+  <!-- Paginación -->
+  <div *ngIf="filteredPayments.length > 0" class="pagination">
+    <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+      ← Anterior
+    </button>
+    <span class="page-info">
+      Página {{ currentPage }} de {{ totalPages }}
+    </span>
+    <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+      Siguiente →
+    </button>
+  </div>
+</div>
+
+<!-- Modal de Mensaje -->
+<app-modal [isOpen]="openModal" [title]="title" [message]="message" [isMercadoPago]="isMercadoPago"
+    (savedCredentiales)="obtenerCredencialesModal($event)" (closed)="closeModal()">
+</app-modal>

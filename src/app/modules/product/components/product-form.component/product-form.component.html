@@ -1,0 +1,65 @@
+<div class="pos-container">
+    <!-- BUSCADOR COMPACTO -->
+    <div class="compact-search">
+        <div class="search-header">
+            <h2 class="title">Nueva Venta</h2>
+        </div>
+
+        <div class="search-controls">
+            <div class="input-wrapper">
+                <input type="text" [(ngModel)]="codigoBarras" placeholder="Código de barras..." class="compact-input"
+                    (keyup.enter)="buscarProducto()" #barcodeInput autofocus>
+            </div>
+
+            <div class="button-wrapper">
+                <button (click)="buscarProducto()" class="btn btn-primary" [disabled]="!codigoBarras.trim()">
+                    <span class="btn-icon">🔍</span>
+                    Buscar
+                </button>
+                <button (click)="limpiarBusqueda()" class="btn-clear" [disabled]="!codigoBarras && !productoEncontrado">
+                    🗑️
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESULTADO COMPACTO -->
+    <div class="compact-results">
+        <!-- Iterar sobre todos los productos encontrados -->
+        <div *ngFor="let producto of productosEncontrados" class="product-card-compact">
+            <div class="product-main">
+                <div class="product-info">
+                    <h3 class="product-name">{{ producto.name }}</h3>
+                    <div class="product-meta">
+                        <span class="product-code">{{ producto.barraCode }}</span>
+                        <span *ngIf="producto.stock !== undefined" class="stock-badge"
+                            [class.low-stock]="producto.stock < 5">
+                            Stock: {{ producto.stock }}
+                        </span>
+                    </div>
+                </div>
+                <div class="product-price">${{ producto.price | number:'1.2-2' }}</div>
+            </div>
+
+            <!-- Información adicional -->
+            <div *ngIf="producto.description" class="product-description">
+                {{ producto.description }}
+            </div>
+
+            <!-- BOTÓN AÑADIR AL CARRITO -->
+            <div class="cart-actions">
+                <button (click)="agregarAlCarrito(producto)" class="btn-add-cart" [disabled]="producto.stock === 0">
+                    🛒 Al Carrito
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="!busquedaRealizada && codigoBarras" class="hint">
+            ⏎ Presiona Enter para buscar
+        </div>
+
+
+    </div>
+    <app-cart-form class="cart-general" (clearView)="limpiarCampos()">
+    </app-cart-form>
+</div>

@@ -1,0 +1,76 @@
+<header class="header">
+  <div class="header-content">
+    <!-- Logo -->
+    <a routerLink="/products/list" class="logo" (click)="closeMenu()">
+      <span class="logo-icon">🏪</span>
+      <h1 class="logo-text">Mi Despensa</h1>
+    </a>
+
+    <!-- Menú de Navegación -->
+    <nav class="nav-menu" [class.open]="isMenuOpen">
+      <!-- Productos - Visible para todos los usuarios autenticados -->
+      <a routerLink="/products/list" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="!isAdmin()">
+        <span class="nav-icon">📦</span>
+        <span class="nav-text">Productos</span>
+      </a>
+
+      <!-- Ventas - Visible para todos los usuarios autenticados -->
+      <a routerLink="/sells/list" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="!isAdmin()">
+        <span class="nav-icon">💰</span>
+        <span class="nav-text">Ventas</span>
+      </a>
+
+      <!-- Nueva Venta - Visible para todos los usuarios autenticados -->
+      <a routerLink="/products" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="!isAdmin()">
+        <span class="nav-icon">🛒</span>
+        <span class="nav-text">Nueva Venta</span>
+      </a>
+
+      <!-- Mercado Pago - Visible para todos los usuarios autenticados -->
+      <a routerLink="/mercadoPago/list" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="!isAdmin()">
+        <span class="nav-icon">💳</span>
+        <span class="nav-text">Mercado Pago</span>
+      </a>
+
+      <!-- ========== OPCIONES SOLO PARA ADMINISTRADORES ========== -->
+
+      <!-- Gestión de Usuarios - Solo Admin -->
+      <a routerLink="/users" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="isAdmin()">
+        <span class="nav-icon">👥</span>
+        <span class="nav-text">Usuarios</span>
+      </a>
+
+      <!-- Gestión de Tiendas - Solo Admin -->
+      <a routerLink="/tiendas" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="isAdmin()">
+        <span class="nav-icon">🏬</span>
+        <span class="nav-text">Tiendas</span>
+      </a>
+
+      <!-- Asignación Usuario-Tienda - Solo Admin -->
+      <a routerLink="/userTienda" class="nav-link" routerLinkActive="active" (click)="closeMenu()" *ngIf="isAdmin()">
+        <span class="nav-icon">🔗</span>
+        <span class="nav-text">Asignaciones</span>
+      </a>
+    </nav>
+
+    <!-- Menú de Usuario -->
+    <div class="user-menu">
+      <div class="user-info" *ngIf="isLoggedIn()">
+        <span class="user-greeting">¡Hola, {{getUsername()}}!
+          <span *ngIf="isAdmin()" class="admin-badge">(Admin)</span>
+        </span>
+      </div>
+
+      <button class="logout-btn" (click)="logout()" *ngIf="isLoggedIn()">
+        <span class="logout-icon">🚪</span>
+        <span class="logout-text">Cerrar Sesión</span>
+      </button>
+
+      <!-- Botón menú móvil -->
+      <button class="mobile-menu-btn" (click)="toggleMenu()">
+        <span *ngIf="!isMenuOpen">☰</span>
+        <span *ngIf="isMenuOpen">✕</span>
+      </button>
+    </div>
+  </div>
+</header>

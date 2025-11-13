@@ -1,0 +1,380 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  background: var(--surface-color);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+  animation: modalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+  .sale-message {
+  white-space: pre-line;
+  line-height: 1.8;
+  font-family: system-ui, -apple-system, sans-serif;
+  
+  // Mejorar la legibilidad del texto
+  background: var(--background-color);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color);
+  
+  // Estilos para los emojis y texto
+  .emoji {
+    margin-right: 0.5rem;
+    font-size: 1.1em;
+  }
+  
+  // Separar las secciones
+  .section {
+    margin-bottom: 1.5rem;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  
+  // Estilo para los productos
+  .product-item {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+    
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+}
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--surface-color);
+  border-radius: 12px 12px 0 0;
+
+  h3 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+
+  &:hover {
+    color: var(--text-primary);
+    background: var(--background-color);
+  }
+}
+
+.modal-body {
+  padding: 2rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+
+  .mercado-pago-form {
+    padding: 15px 0;
+
+    h3 {
+      margin-bottom: 20px;
+      font-size: 1.25rem;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+
+      label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-sizing: border-box;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+        }
+      }
+    }
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid var(--border-color);
+  background: var(--surface-color);
+  border-radius: 0 0 12px 12px;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: var(--primary-hover);
+  }
+}
+
+.btn-secondary {
+  background: var(--text-muted);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: var(--text-secondary);
+  }
+}
+
+// Variantes adicionales de botones
+.btn-success {
+  background: var(--success-color);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #047857;
+  }
+}
+
+.btn-warning {
+  background: var(--warning-color);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #b45309;
+  }
+}
+
+.btn-error {
+  background: var(--error-color);
+  color: white;
+
+  &:hover:not(:disabled) {
+    background: #b91c1c;
+  }
+}
+
+// Modal sizes
+.modal-sm {
+  max-width: 400px;
+}
+
+.modal-lg {
+  max-width: 700px;
+}
+
+.modal-xl {
+  max-width: 900px;
+}
+
+// Modal con ícono
+.modal-with-icon {
+  .modal-header {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+
+    .modal-icon {
+      font-size: 3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h3 {
+      margin: 0;
+    }
+  }
+}
+
+// Modal de confirmación
+.confirmation-modal {
+  .modal-body {
+    text-align: center;
+    padding: 2rem;
+
+    .confirmation-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.8;
+    }
+
+    .confirmation-message {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-bottom: 0;
+    }
+
+    .mercado-pago-form {
+      padding: 15px 0;
+
+      h3 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 1.25rem;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+
+        label {
+          display: block;
+          margin-bottom: 5px;
+          font-weight: bold;
+          color: #555;
+        }
+
+        .form-control {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid #ddd;
+          border-radius: 4px;
+          box-sizing: border-box;
+
+          &:focus {
+            outline: none;
+            border-color: #007bff;
+          }
+        }
+      }
+    }
+
+  }
+
+
+
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .modal-content {
+    width: 95%;
+    margin: 1rem;
+  }
+
+  .modal-header {
+    padding: 1.25rem 1.5rem;
+  }
+
+  .modal-body {
+    padding: 1.5rem;
+  }
+
+  .modal-footer {
+    padding: 1.25rem 1.5rem;
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// Animación de salida
+.modal-overlay.modal-exiting {
+  .modal-content {
+    animation: modalSlideOut 0.2s ease-out;
+  }
+}
+
+@keyframes modalSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+}
+
+// Tema oscuro
+@media (prefers-color-scheme: dark) {
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  .modal-content {
+    background: var(--surface-color);
+    border-color: var(--border-color);
+  }
+}

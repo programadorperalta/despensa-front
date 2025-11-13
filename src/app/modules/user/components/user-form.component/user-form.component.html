@@ -1,0 +1,178 @@
+<div class="product-list-container">
+    <div class="header">
+        <h2>
+            <i class="icon-user"></i>
+            {{ isEditMode ? 'Editar Usuario' : 'Crear Usuario' }}
+        </h2>
+        <div class="header-actions">
+            <button class="btn-list" (click)="toggleUserList()" [class.active]="showUserList">
+                <i class="icon-list"></i>
+                {{ showUserList ? 'Ocultar Listado' : 'Ver Listado' }}
+            </button>
+        </div>
+    </div>
+
+    <!-- Listado de Usuarios (se muestra solo cuando showUserList es true) -->
+    <div class="table-container" *ngIf="showUserList">
+        <div class="table-header">
+            <h3 class="section-title">Listado de Usuarios</h3>
+            <div class="table-actions">
+                <button class="btn-refresh" (click)="getUsersWithEncryptPassword()" title="Actualizar lista">
+                    <i class="icon-refresh"></i>
+                    Actualizar
+                </button>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="loadingUsers">
+            <div class="loading-spinner"></div>
+            Cargando usuarios...
+        </div>
+
+        <!-- Tabla de usuarios -->
+        <div class="users-table" *ngIf="!loadingUsers && users && users.length > 0">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                        <th>Estado</th>
+                        <th>Contraseña</th>
+                        <!-- <th>Ver Contraseña</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let user of users" [class.inactive]="!user.status">
+                        <td class="id-cell">{{ user.id }}</td>
+                        <td class="name-cell">
+                            <div class="user-info">
+                                <span class="user-name">{{ user.username }}</span>
+                            </div>
+                        </td>
+                        <td class="email-cell">{{ user.email }}</td>
+                        <td class="role-cell">
+                            <span class="role-badge" [class.administrador]="user.rol === 'administrador'"
+                                [class.normal]="user.rol === 'normal'">
+                                {{ user.rol | titlecase }}
+                            </span>
+                        </td>
+                        <td class="status-cell">
+                            <span class="status-badge" [class.active]="user.status" [class.inactive]="!user.status">
+                                {{ user.status ? 'Activo' : 'Inactivo' }}
+                            </span>
+                        </td>
+                        <td class="password-cell">
+                            <div class="password-display">
+                                <span class="password-text">{{ user.password }}</span>
+                                <button class="btn-copy" (click)="copyToClipboard(user.password)"
+                                    title="Copiar contraseña">
+                                    <i class="icon-copy"></i>
+                                </button>
+                            </div>
+                        </td>
+                        <!-- <td class="actions-cell">
+                            <div class="action-buttons">
+                                <button class="btn-edit" (click)="showPassword(user)" title="Editar usuario">
+                                    <i class="icon-edit">Ver</i>
+                                </button>
+                                <button class="btn-delete" (click)="deleteUser(user)" title="Eliminar usuario">
+                                    <i class="icon-trash"></i>
+                                </button>
+                            </div>
+                        </td> -->
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Mensaje cuando no hay usuarios -->
+        <div class="empty-state" *ngIf="!loadingUsers && users && users.length === 0">
+            <div class="empty-icon">
+                <i class="icon-users"></i>
+            </div>
+            <h3>No hay usuarios registrados</h3>
+            <p>Comienza creando el primer usuario del sistema.</p>
+        </div>
+    </div>
+
+    <!-- Formulario de Usuario -->
+    <div class="table-container">
+        <form [formGroup]="userForm" (ngSubmit)="onSubmit()" class="user-form">
+            <div class="form-content">
+                <!-- Información Básica -->
+                <div class="form-section">
+                    <h3 class="section-title">Información Básica</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="username" class="form-label">Username *</label>
+                            <input readonly type="text" id="username" formControlName="username" class="form-input"
+                                placeholder="Ingrese el nombre de usuario" [class.error]="isFieldInvalid('username')">
+                            <div class="error-message" *ngIf="isFieldInvalid('username')">
+                                <span *ngIf="userForm.get('username')?.errors?.['required']">El nombre es
+                                    requerido</span>
+                                <span *ngIf="userForm.get('username')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email" class="form-label">Email *</label>
+                            <input type="email" id="email" formControlName="email" class="form-input"
+                                placeholder="Ingrese el email" [class.error]="isFieldInvalid('email')">
+                            <div class="error-message" *ngIf="isFieldInvalid('email')">
+                                <span *ngIf="userForm.get('email')?.errors?.['required']">El email es requerido</span>
+                                <span *ngIf="userForm.get('email')?.errors?.['email']">Formato de email inválido</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="rol" class="form-label">Rol *</label>
+                            <select id="rol" formControlName="rol" class="form-select"
+                                [class.error]="isFieldInvalid('rol')">
+                                <option value="">Seleccione un rol</option>
+                                <option value="ADMINISTRADOR">Administrador</option>
+                                <option value="NORMAL">Normal</option>
+                            </select>
+                            <div class="error-message" *ngIf="isFieldInvalid('role')">
+                                El rol es requerido
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Configuración -->
+                <div class="form-section">
+                    <h3 class="section-title">Configuración</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" formControlName="status" class="checkbox">
+                                <span class="checkmark"></span>
+                                Usuario activo
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="isLoading">
+                    <i class="icon-x"></i>
+                    Cancelar
+                </button>
+                <button type="submit" class="btn-primary" [disabled]="userForm.invalid || isLoading">
+                    <i class="icon-check" *ngIf="!isLoading"></i>
+                    <div class="loading-spinner" *ngIf="isLoading"></div>
+                    {{ isEditMode ? 'Actualizar' : 'Crear' }} Usuario
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

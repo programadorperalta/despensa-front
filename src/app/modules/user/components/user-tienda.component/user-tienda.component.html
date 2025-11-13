@@ -1,0 +1,155 @@
+<div class="product-list-container">
+    <div class="header">
+        <h2>
+            <i class="icon-link"></i>
+            Asignación de Usuarios a Tiendas
+        </h2>
+        <button class="btn-primary" (click)="openAsignacionModal()">
+            <i class="icon-plus"></i>
+            Nueva Asignación
+        </button>
+    </div>
+
+    <!-- Filtros y búsqueda -->
+    <div class="filters-section">
+        <div class="search-filter">
+            <input type="text" class="search-input" placeholder="Buscar por nombre de usuario o tienda..."
+                [(ngModel)]="searchTerm" (input)="applyFilters()">
+            <select class="filter-select" [(ngModel)]="selectedTienda" (change)="applyFilters()">
+                <option value="">Todas las tiendas</option>
+                <option *ngFor="let tienda of tiendas" [value]="tienda.id">{{ tienda.nombre }}</option>
+            </select>
+            <select class="filter-select" [(ngModel)]="selectedUsuario" (change)="applyFilters()">
+                <option value="">Todos los usuarios</option>
+                <option *ngFor="let usuario of usuarios" [value]="usuario.id">{{ usuario.username }}</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table class="products-table">
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Tienda</th>
+                    <th>Fecha de Asignación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let asignacion of asignacionesToVisualice" class="product-row">
+                    <td>
+                        <div class="user-info">
+                            <strong>{{ getUsuarioNombre(asignacion.usuario.id) }}</strong>
+                            <small class="text-muted">{{ getUsuarioEmail(asignacion.usuarioId) }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="tienda-info">
+                            <strong>{{ getTiendaNombre(asignacion.tienda.id) }}</strong>
+                            <small class="text-muted">{{ getTiendaDireccion(asignacion.tienda.id) }}</small>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-info">
+                            {{ asignacion.asignacion | date:'medium' }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <button class="btn btn-delete" (click)="eliminarAsignacion(asignacion)"
+                                [disabled]="isLoading">
+                                <i class="icon-trash"></i>
+                                Eliminar
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Estado vacío -->
+        <div class="no-products" *ngIf="asignacionesToVisualice.length === 0">
+            <div class="no-products-icon">🏪</div>
+            <h3>No hay asignaciones</h3>
+            <p>No se encontraron asignaciones de usuarios a tiendas con los filtros aplicados.</p>
+            <button class="btn-primary" (click)="openAsignacionModal()">
+                <i class="icon-plus"></i>
+                Crear primera asignación
+            </button>
+        </div>
+    </div>
+
+    <!-- Paginación -->
+    <div class="pagination" *ngIf="asignacionesFiltradas.length > 0">
+        <button class="page-btn" (click)="previousPage()" [disabled]="currentPage === 1">
+            <i class="icon-chevron-left"></i>
+        </button>
+
+        <span class="page-info">
+            Página {{ currentPage }} de {{ totalPages }}
+        </span>
+
+        <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+            <i class="icon-chevron-right"></i>
+        </button>
+    </div>
+</div>
+
+<!-- Modal para nueva asignación -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Nueva Asignación</h3>
+            <button class="modal-close" (click)="closeModal()">
+                <i class="icon-x"></i>
+            </button>
+        </div>
+
+        <div class="modal-body">
+            <div class="form-group">
+                <label class="form-label">Seleccionar Usuario *</label>
+                <select class="form-select" [(ngModel)]="nuevaAsignacion.usuarioId"
+                    [class.error]="!nuevaAsignacion.usuarioId && formSubmitted">
+                    <option value="">Seleccione un usuario</option>
+                    <option *ngFor="let usuario of usuariosDisponibles" [value]="usuario.id">
+                        {{ usuario.username }} - {{ usuario.email }}
+                    </option>
+                </select>
+                <div class="error-message" *ngIf="!nuevaAsignacion.usuarioId && formSubmitted">
+                    Debe seleccionar un usuario
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Seleccionar Tienda *</label>
+                <select class="form-select" [(ngModel)]="nuevaAsignacion.tiendaId"
+                    [class.error]="!nuevaAsignacion.tiendaId && formSubmitted">
+                    <option value="">Seleccione una tienda</option>
+                    <option *ngFor="let tienda of tiendasDisponibles" [value]="tienda.id">
+                        {{ tienda.nombre }} - {{ tienda.direccion }}
+                    </option>
+                </select>
+                <div class="error-message" *ngIf="!nuevaAsignacion.tiendaId && formSubmitted">
+                    Debe seleccionar una tienda
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="asignacionExistente">
+                <div class="warning-message">
+                    <i class="icon-alert-triangle"></i>
+                    Esta asignación ya existe
+                </div>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-secondary" (click)="closeModal()">Cancelar</button>
+            <button class="btn-primary" (click)="confirmarAsignacion()" [disabled]="isLoading">
+                <i class="icon-check" *ngIf="!isLoading"></i>
+                <div class="loading-spinner" *ngIf="isLoading"></div>
+                {{ isLoading ? 'Asignando...' : 'Confirmar Asignación' }}
+            </button>
+        </div>
+    </div>
+</div>

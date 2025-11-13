@@ -1,0 +1,69 @@
+<div class="cart-container">
+  <div class="cart-header">
+    <h2 class="cart-title">Carrito</h2>
+    <div class="cart-summary">
+      <span class="items-count">{{ carrito?.items?.length }} items</span>
+      <span class="total-amount">Total ${{ carrito?.totalPrice}}</span>
+    </div>
+  </div>
+
+  <!-- Carrito Vacío -->
+  <div *ngIf="carrito?.items?.length === 0" class="empty-cart">
+    <div class="empty-icon">🛒</div>
+    <h3>Carrito Vacío</h3>
+    <p>Agrega productos desde el buscador</p>
+  </div>
+
+  <!-- Lista de Productos en el Carrito -->
+  <div *ngIf="carrito?.items?.length || 0 > 0" class="cart-items">
+    <div *ngFor="let item of carrito?.items; let i = index" class="cart-item">
+      <div class="item-info">
+        <h4 class="item-name">{{ item.name }}</h4>
+        <div class="item-details">
+          <span class="item-code">Cód: {{ item.barraCode }}</span>
+          <span class="item-price">${{ item.price}} c/u</span>
+        </div>
+      </div>
+
+      <div class="item-controls">
+        <div class="quantity-controls">
+          <button (click)="disminuirCantidad(i)" class="btn-quantity" [disabled]="item.cantidad <= 1">
+            -
+          </button>
+          <span class="quantity">{{ item.cantidad }}</span>
+          <button (click)="aumentarCantidad(i)" class="btn-quantity" [disabled]="item.cantidad >= item.stock">
+            +
+          </button>
+        </div>
+
+        <div class="item-subtotal">
+          ${{ item.subtotal }}
+        </div>
+
+        <button (click)="eliminarItem(i)" class="btn-remove" title="Eliminar producto">
+          🗑️
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones del Carrito -->
+  <div *ngIf="carrito?.items?.length || 0 > 0" class="cart-actions">
+    <button (click)="limpiarCarrito()" class="btn-clear-cart">
+      🗑️ Vaciar Carrito
+    </button>
+
+    <button (click)="procesarVentaClick()" class="btn-process-sale" [disabled]="carrito?.items?.length === 0">
+      💰 Procesar Venta
+    </button>
+  </div>
+</div>
+
+<!-- Modal de Venta -->
+<app-venta-form *ngIf="mostrarVentaModal" [carritoParaVenta]="carritoParaVenta" (ventaCancelada)="onVentaCancelada()"
+  (ventaConfirmada)="onVentaProcesada()">
+</app-venta-form>
+
+<!-- Modal de Mensaje -->
+<app-modal [isOpen]="openModal" [title]="title" [message]="mensaje">
+</app-modal>

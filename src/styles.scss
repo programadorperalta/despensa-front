@@ -1,0 +1,196 @@
+:root {
+  // Color principal - Azul profesional moderno
+  --primary-color: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-light: #dbeafe;
+  
+  // Colores de fondo - Gris neutro muy suave
+  --background-color: #f8fafc;
+  --surface-color: #ffffff;
+  
+  // Colores de texto
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  
+  // Bordes y elementos de UI
+  --border-color: #e2e8f0;
+  --border-light: #f1f5f9;
+  
+  // Estados
+  --success-color: #059669;
+  --warning-color: #d97706;
+  --error-color: #dc2626;
+  --info-color: #0369a1;
+  
+  // Sombras
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+// Aplicar a toda la app
+body {
+  background-color: var(--background-color);
+  color: var(--text-primary);
+  font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+// Alternativa más vibrante pero profesional
+:root.alternative {
+  --background-color: #f0f9ff;  // Azul muy claro
+  --surface-color: #ffffff;
+  --text-primary: #0c4a6e;
+  --text-secondary: #0369a1;
+  --text-muted: #0ea5e9;
+  --border-color: #bae6fd;
+  --primary-color: #0284c7;
+  --primary-hover: #0369a1;
+}
+
+// Alternativa oscura (opcional)
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background-color: #0f172a;
+    --surface-color: #1e293b;
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --primary-color: #3b82f6;
+    --primary-hover: #60a5fa;
+  }
+
+  // styles.scss (después de tus variables :root)
+
+/* ===== ESTILOS PARA TOASTS ===== */
+.success-toast {
+  background: linear-gradient(135deg, var(--success-color), #047857) !important;
+  color: white !important;
+  font-weight: 500;
+  border-radius: 8px !important;
+  
+  .mat-simple-snackbar-action {
+    color: white !important;
+    font-weight: 600;
+    opacity: 0.9;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.error-toast {
+  background: linear-gradient(135deg, var(--error-color), #b91c1c) !important;
+  color: white !important;
+  font-weight: 500;
+  border-radius: 8px !important;
+  
+  .mat-simple-snackbar-action {
+    color: white !important;
+    font-weight: 600;
+    opacity: 0.9;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.info-toast {
+  background: linear-gradient(135deg, var(--info-color), #075985) !important;
+  color: white !important;
+  font-weight: 500;
+  border-radius: 8px !important;
+  
+  .mat-simple-snackbar-action {
+    color: white !important;
+    font-weight: 600;
+    opacity: 0.9;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+.warning-toast {
+  background: linear-gradient(135deg, var(--warning-color), #b45309) !important;
+  color: white !important;
+  font-weight: 500;
+  border-radius: 8px !important;
+  
+  .mat-simple-snackbar-action {
+    color: white !important;
+    font-weight: 600;
+    opacity: 0.9;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* Estilos generales para el contenedor de toasts */
+.mat-snack-bar-container {
+  border-radius: 8px !important;
+  box-shadow: var(--shadow-lg) !important;
+  min-width: auto !important;
+  max-width: 500px !important;
+  margin: 8px !important;
+}
+
+/* Mejoras para el texto del toast */
+.mat-snack-bar-handset {
+  .mat-snack-bar-container {
+    margin: 8px !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+}
+
+/* Asegurar que los toasts se vean bien en modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .success-toast {
+    background: linear-gradient(135deg, var(--success-color), #065f46) !important;
+  }
+  
+  .error-toast {
+    background: linear-gradient(135deg, var(--error-color), #991b1b) !important;
+  }
+  
+  .info-toast {
+    background: linear-gradient(135deg, var(--info-color), #0c4a6e) !important;
+  }
+  
+  .warning-toast {
+    background: linear-gradient(135deg, var(--warning-color), #92400e) !important;
+  }
+}
+
+/* Para la alternativa vibrante */
+:root.alternative {
+  .success-toast {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+  }
+  
+  .error-toast {
+    background: linear-gradient(135deg, #ef4444, #dc2626) !important;
+  }
+  
+  .info-toast {
+    background: linear-gradient(135deg, var(--primary-color), #0369a1) !important;
+  }
+  
+  .warning-toast {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+  }
+}
+}
+
+
+
+

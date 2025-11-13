@@ -1,0 +1,47 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="close()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h1>{{ title }}</h1>
+            <button class="close-btn" (click)="close()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <!-- Formulario MercadoPago -->
+            <div *ngIf="isMercadoPago" class="mercado-pago-form">
+                <h3>Configuración de MercadoPago</h3>
+                <form #mercadoPagoForm="ngForm" (ngSubmit)="guardarCredenciales()">
+                    <div class="form-group">
+                        <label for="client_id">Client ID</label>
+                        <input type="text" id="client_id" name="client_id" [(ngModel)]="credenciales.client_id"
+                            class="form-control" placeholder="Ingresa tu Client ID" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="client_secret">Client Secret</label>
+                        <input type="password" id="client_secret" name="client_secret"
+                            [(ngModel)]="credenciales.client_secret" class="form-control"
+                            placeholder="Ingresa tu Client Secret" required>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Contenido normal del modal -->
+            <ng-content *ngIf="!isMercadoPago"><div class="sale-message">{{message}}</div></ng-content>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-secondary" (click)="close()">Cancelar</button>
+
+            <!-- Botón para MercadoPago -->
+            <button *ngIf="isMercadoPago" type="button" class="btn btn-primary" (click)="guardarCredenciales()"
+                [disabled]="!credenciales.client_id || !credenciales.client_secret">
+                Validar Información
+            </button>
+
+            <button *ngIf="isDelete" type="button" class="btn btn-danger" (click)="confirmarEliminacion()">
+                Sí, Desactivar
+            </button>
+            <button *ngIf="isActivate" type="button" class="btn btn-danger" (click)="confirmarActivacion()">
+                Sí, Activar
+            </button>
+            <ng-content select="[modal-actions]" *ngIf="!isMercadoPago"></ng-content>
+        </div>
+    </div>
+</div>

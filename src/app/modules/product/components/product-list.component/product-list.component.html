@@ -1,0 +1,107 @@
+<div class="product-list-container">
+  <div class="header">
+    <h2>Lista de Productos</h2>
+    <button (click)="nuevoProducto()" class="btn btn-primary">
+      ➕ Nuevo Producto
+    </button>
+  </div>
+
+  <!-- BUSCADOR Y FILTROS -->
+  <div class="search-filters-section">
+    <div class="search-container">
+      <input 
+        type="text" 
+        class="search-input" 
+        placeholder="Buscar productos por nombre, código o descripción..."
+        [(ngModel)]="searchTerm"
+        (input)="applyFilter()"
+      >
+      <span class="search-icon">🔍</span>
+    </div>
+    
+    <div class="filters-container">
+      <select class="filter-select" [(ngModel)]="statusFilter" (change)="applyFilter()">
+        <option value="">Todos los estados</option>
+        <option value="active">Activos</option>
+        <option value="inactive">Inactivos</option>
+      </select>
+      
+      <select class="filter-select" [(ngModel)]="stockFilter" (change)="applyFilter()">
+        <option value="">Todo el stock</option>
+        <option value="low">Stock bajo (≤ 5)</option>
+        <option value="out">Sin stock</option>
+        <option value="available">Con stock</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="table-container">
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Estado</th>
+          <th>Código Barras</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let product of filteredProducts" class="product-row">
+          <td>{{ product.barraCode }}</td>
+          <td>{{ product.name }}</td>
+          <td>{{ product.description || 'Sin descripción' }}</td>
+          <td>{{ formatearPrecio(product.price || 0) }}</td>
+          <td>
+            <span [class.low-stock]="product.stock || 0 <= 5" [class.out-of-stock]="product.stock === 0">
+              {{ product.stock }}
+            </span>
+          </td>
+          <td>{{ product.status ? 'Activo' : 'Inactivo' }}</td>
+          <td class="barcode"><div [appBarcode]="product.barraCode || '' "></div></td>
+          <td class="actions">
+            <button (click)="editarProducto(product)" class="btn btn-edit">
+              ✏️ Editar
+            </button>
+            <button (click)="eliminarProducto(product)" class="btn btn-delete">
+              ⬇️ Desactivar
+            </button>
+            <button (click)="activateProduct(product)" class="btn btn-activate">
+              ⬆️ Activar
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredProducts.length === 0">
+          <td colspan="8" class="no-products">
+            <div class="no-products-content">
+              <span class="no-products-icon">📦</span>
+              <h3>No se encontraron productos</h3>
+              <p *ngIf="products.length === 0">No hay productos registrados en el sistema.</p>
+              <p *ngIf="products.length > 0">No hay productos que coincidan con tu búsqueda.</p>
+              <button *ngIf="products.length === 0" (click)="nuevoProducto()" class="btn btn-primary">
+                ➕ Crear primer producto
+              </button>
+              <button *ngIf="products.length > 0" (click)="clearFilters()" class="btn btn-secondary">
+                🔄 Limpiar filtros
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal para crear/editar productos -->
+  <app-product-form-modal [isOpen]="showModal" [product]="selectedProduct" (closed)="onModalClosed()"
+    (saved)="onProductSaved($event)">
+  </app-product-form-modal>
+</div>
+
+<!-- Modal de Mensaje -->
+<app-modal [isOpen]="openModal" [title]="title" [message]="mensaje" [isDelete]="isDelete" [isActivate]="isActivation"
+  (confirmDelete)="confirmDelete()" (closed)="onModalClosed()" (confirmActivation)="confirmActivation()">
+</app-modal>
