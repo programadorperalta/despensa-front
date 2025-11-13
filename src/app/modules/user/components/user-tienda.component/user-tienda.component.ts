@@ -7,7 +7,6 @@ import Tienda from '../../../product/models/tienda/tienda';
 import { UserService } from '../../../product/services/user.service';
 import { TiendaService } from '../../../product/services/tienda.service';
 import { UserTiendaService } from '../../../product/services/userTienda.service';
-import { response } from 'express';
 import { ToastService } from '../../../product/services/toast.service';
 
 @Component({

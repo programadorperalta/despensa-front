@@ -22,10 +22,18 @@ export class TiendaFormComponent implements OnInit {
   isEditMode = false;
   isLoading = false;
 
+  //Para ver el listado de tiendas
+  tiendas: Tienda[] = [];
+  showTiendaList: boolean = false;
+  loadingTiendas: boolean = false;
+
   constructor(private fb: FormBuilder, private tiendaService: TiendaService, private toastService: ToastService) { }
 
   ngOnInit(): void {
     this.isEditMode = !!this.tienda;
+    //Buscamos todas las tiendas
+    this.getTiendas();
+    //Iniciamos el formulario
     this.initForm();
   }
 
@@ -44,6 +52,15 @@ export class TiendaFormComponent implements OnInit {
         [Validators.required, Validators.pattern(/^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/)]
       ]
     });
+  }
+
+  // Método para mostrar/ocultar el listado
+  toggleTiendaList(): void {
+    this.showTiendaList = !this.showTiendaList;
+    
+    if (this.showTiendaList && (!this.tiendas || this.tiendas.length === 0)) {
+      this.getTiendas();
+    }
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -77,6 +94,15 @@ export class TiendaFormComponent implements OnInit {
         this.tiendaForm.get(key)?.markAsTouched();
       });
     }
+  }
+
+  getTiendas():void{
+    this.tiendaService.getAllTiendas().subscribe({
+      next:(response:Tienda[]) => {
+        this.tiendas = response;
+        this.loadingTiendas = false;
+      }
+    })
   }
 
   onCancel(): void {

@@ -1,108 +1,184 @@
 <div class="product-list-container">
-  <div class="header">
-    <h2>
-      <i class="icon-store"></i>
-      {{ isEditMode ? 'Editar Tienda' : 'Crear Tienda' }}
-    </h2>
-  </div>
+    <div class="header">
+        <h2>
+            <i class="icon-store"></i>
+            {{ isEditMode ? 'Editar Tienda' : 'Crear Tienda' }}
+        </h2>
+        <div class="header-actions">
+            <button class="btn-list" (click)="toggleTiendaList()" [class.active]="showTiendaList">
+                <i class="icon-list"></i>
+                {{ showTiendaList ? 'Ocultar Listado' : 'Ver Listado' }}
+            </button>
+        </div>
+    </div>
 
-  <div class="table-container">
-    <form [formGroup]="tiendaForm" (ngSubmit)="onSubmit()" class="user-form">
-      <div class="form-content">
-        <!-- Información de la Tienda -->
-        <div class="form-section">
-          <h3 class="section-title">Información de la Tienda</h3>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label for="nombre" class="form-label">Nombre de la tienda *</label>
-              <input
-                type="text"
-                id="nombre"
-                formControlName="nombre"
-                class="form-input"
-                placeholder="Ingrese el nombre de la tienda"
-                [class.error]="isFieldInvalid('nombre')"
-              >
-              <div class="error-message" *ngIf="isFieldInvalid('nombre')">
-                <span *ngIf="tiendaForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
-                <span *ngIf="tiendaForm.get('nombre')?.errors?.['minlength']">Mínimo 3 caracteres</span>
-              </div>
+    <!-- Listado de Tiendas -->
+    <div class="table-container" *ngIf="showTiendaList">
+        <div class="table-header">
+            <h3 class="section-title">Listado de Tiendas</h3>
+            <div class="table-actions">
+                <button class="btn-refresh" (click)="getTiendas()" title="Actualizar lista">
+                    <i class="icon-refresh"></i>
+                    Actualizar
+                </button>
             </div>
-
-            <div class="form-group">
-              <label for="telefono" class="form-label">Teléfono *</label>
-              <input
-                type="tel"
-                id="telefono"
-                formControlName="telefono"
-                class="form-input"
-                placeholder="Ingrese el teléfono"
-                [class.error]="isFieldInvalid('telefono')"
-              >
-              <div class="error-message" *ngIf="isFieldInvalid('telefono')">
-                <span *ngIf="tiendaForm.get('telefono')?.errors?.['required']">El teléfono es requerido</span>
-                <span *ngIf="tiendaForm.get('telefono')?.errors?.['pattern']">Formato de teléfono inválido</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group full-width">
-              <label for="direccion" class="form-label">Dirección *</label>
-              <textarea
-                id="direccion"
-                formControlName="direccion"
-                class="form-textarea"
-                placeholder="Ingrese la dirección completa"
-                rows="3"
-                [class.error]="isFieldInvalid('direccion')"
-              ></textarea>
-              <div class="error-message" *ngIf="isFieldInvalid('direccion')">
-                <span *ngIf="tiendaForm.get('direccion')?.errors?.['required']">La dirección es requerida</span>
-                <span *ngIf="tiendaForm.get('direccion')?.errors?.['minlength']">Mínimo 10 caracteres</span>
-              </div>
-            </div>
-          </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div class="loading-state" *ngIf="loadingTiendas">
+            <div class="loading-spinner"></div>
+            Cargando tiendas...
         </div>
 
-        <!-- Información Adicional -->
-        <div class="form-section" *ngIf="isEditMode">
-          <h3 class="section-title">Información Adicional</h3>
-          
-          <div class="form-row">
-            <div class="form-group">
-              <label class="form-label">ID de la Tienda</label>
-              <div class="readonly-field">
-                {{ tienda?.id }}
-              </div>
-              <small class="field-hint">Este ID es autogenerado y no se puede modificar</small>
-            </div>
-          </div>
+        <!-- Tabla de tiendas -->
+        <div class="users-table" *ngIf="!loadingTiendas && tiendas && tiendas.length > 0">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Dirección</th>
+                        <th>Teléfono</th>
+                        <!-- <th>Acciones</th> -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let tienda of tiendas">
+                        <td class="id-cell">{{ tienda.id }}</td>
+                        <td class="name-cell">
+                            <div class="user-info">
+                                <span class="user-name">{{ tienda.nombre }}</span>
+                            </div>
+                        </td>
+                        <td class="email-cell">{{ tienda.direccion }}</td>
+                        <td class="role-cell">
+                            <span class="role-badge phone">
+                                {{ tienda.telefono }}
+                            </span>
+                        </td>
+                        <!-- <td class="actions-cell">
+                            <div class="action-buttons">
+                                <button class="btn-edit" (click)="editTienda(tienda)" title="Editar tienda">
+                                    <i class="icon-edit"></i>
+                                </button>
+                                <button class="btn-delete" (click)="deleteTienda(tienda)" title="Eliminar tienda">
+                                    <i class="icon-trash"></i>
+                                </button>
+                            </div>
+                        </td> -->
+                    </tr>
+                </tbody>
+            </table>
         </div>
-      </div>
 
-      <!-- Botones de acción -->
-      <div class="form-actions">
-        <button
-          type="button"
-          class="btn-secondary"
-          (click)="onCancel()"
-          [disabled]="isLoading"
-        >
-          <i class="icon-x"></i>
-          Cancelar
-        </button>
-        <button
-          type="submit"
-          class="btn-primary"
-          [disabled]="tiendaForm.invalid || isLoading"
-        >
-          <i class="icon-check" *ngIf="!isLoading"></i>
-          <div class="loading-spinner" *ngIf="isLoading"></div>
-          {{ isEditMode ? 'Actualizar' : 'Crear' }} Tienda
-        </button>
-      </div>
-    </form>
-  </div>
+        <!-- Mensaje cuando no hay tiendas -->
+        <div class="empty-state" *ngIf="!loadingTiendas && tiendas && tiendas.length === 0">
+            <div class="empty-icon">
+                <i class="icon-store"></i>
+            </div>
+            <h3>No hay tiendas registradas</h3>
+            <p>Comienza creando la primera tienda del sistema.</p>
+        </div>
+    </div>
+
+    <!-- Formulario de Tienda -->
+    <div class="table-container">
+        <form [formGroup]="tiendaForm" (ngSubmit)="onSubmit()" class="user-form">
+            <div class="form-content">
+                <!-- Información de la Tienda -->
+                <div class="form-section">
+                    <h3 class="section-title">Información de la Tienda</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="nombre" class="form-label">Nombre de la tienda *</label>
+                            <input
+                                type="text"
+                                id="nombre"
+                                formControlName="nombre"
+                                class="form-input"
+                                placeholder="Ingrese el nombre de la tienda"
+                                [class.error]="isFieldInvalid('nombre')"
+                            >
+                            <div class="error-message" *ngIf="isFieldInvalid('nombre')">
+                                <span *ngIf="tiendaForm.get('nombre')?.errors?.['required']">El nombre es requerido</span>
+                                <span *ngIf="tiendaForm.get('nombre')?.errors?.['minlength']">Mínimo 3 caracteres</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="telefono" class="form-label">Teléfono *</label>
+                            <input
+                                type="tel"
+                                id="telefono"
+                                formControlName="telefono"
+                                class="form-input"
+                                placeholder="Ingrese el teléfono"
+                                [class.error]="isFieldInvalid('telefono')"
+                            >
+                            <div class="error-message" *ngIf="isFieldInvalid('telefono')">
+                                <span *ngIf="tiendaForm.get('telefono')?.errors?.['required']">El teléfono es requerido</span>
+                                <span *ngIf="tiendaForm.get('telefono')?.errors?.['pattern']">Formato de teléfono inválido</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="direccion" class="form-label">Dirección *</label>
+                            <textarea
+                                id="direccion"
+                                formControlName="direccion"
+                                class="form-textarea"
+                                placeholder="Ingrese la dirección completa"
+                                rows="3"
+                                [class.error]="isFieldInvalid('direccion')"
+                            ></textarea>
+                            <div class="error-message" *ngIf="isFieldInvalid('direccion')">
+                                <span *ngIf="tiendaForm.get('direccion')?.errors?.['required']">La dirección es requerida</span>
+                                <span *ngIf="tiendaForm.get('direccion')?.errors?.['minlength']">Mínimo 10 caracteres</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información Adicional -->
+                <div class="form-section" *ngIf="isEditMode">
+                    <h3 class="section-title">Información Adicional</h3>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">ID de la Tienda</label>
+                            <div class="readonly-field">
+                                {{ tienda?.id }}
+                            </div>
+                            <small class="field-hint">Este ID es autogenerado y no se puede modificar</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="form-actions">
+                <button
+                    type="button"
+                    class="btn-secondary"
+                    (click)="onCancel()"
+                    [disabled]="isLoading"
+                >
+                    <i class="icon-x"></i>
+                    Cancelar
+                </button>
+                <button
+                    type="submit"
+                    class="btn-primary"
+                    [disabled]="tiendaForm.invalid || isLoading"
+                >
+                    <i class="icon-check" *ngIf="!isLoading"></i>
+                    <div class="loading-spinner" *ngIf="isLoading"></div>
+                    {{ isEditMode ? 'Actualizar' : 'Crear' }} Tienda
+                </button>
+            </div>
+        </form>
+    </div>
 </div>
