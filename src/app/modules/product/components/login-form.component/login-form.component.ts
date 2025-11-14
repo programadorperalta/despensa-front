@@ -63,20 +63,26 @@ export class LoginFormComponent {
   }
 
   private handleSuccessfulLogin(): void {
-    // Verificar si tiene tiendas
     const tiendas = this.roleService.findIdsTiendas();
     const tieneTiendas = tiendas && tiendas.length > 0;
 
-    // Mostrar toast si no tiene tiendas
     if (!tieneTiendas) {
       return;
     }
 
-    // Redirigir según el rol
+    // Forzar redirección incluso si el router falla
     if (this.roleService.isAdmin()) {
-      this.router.navigate(['/users']);
+      this.router.navigate(['/users']).then(success => {
+        if (!success) {
+          window.location.href = '/users'; // Fallback
+        }
+      });
     } else {
-      this.router.navigate(['/products']);
+      this.router.navigate(['/products']).then(success => {
+        if (!success) {
+          window.location.href = '/products'; // Fallback
+        }
+      });
     }
   }
 
