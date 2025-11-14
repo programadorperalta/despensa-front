@@ -2,9 +2,9 @@
   publish = "dist/despensaR/browser"
 
 [[redirects]]
-  from = "/"
-  to = "/login"
-  status = 302
+  from = "/*"
+  to = "/index.html"
+  status = 200
 
 [[redirects]]
   from = "/*"
