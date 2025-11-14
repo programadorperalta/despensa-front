@@ -114,7 +114,6 @@
                             <div class="error-message" *ngIf="isFieldInvalid('username')">
                                 <span *ngIf="userForm.get('username')?.errors?.['required']">El nombre es
                                     requerido</span>
-                                <span *ngIf="userForm.get('username')?.errors?.['minlength']">Mínimo 3 caracteres</span>
                             </div>
                         </div>
 
